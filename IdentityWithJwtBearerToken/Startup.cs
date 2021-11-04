@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace IdentityWithJwtBearerToken
         public void ConfigureServices(IServiceCollection services)
         {
 
-            var key = Encoding.ASCII.GetBytes("MY_BIG_SECRET_KEY_lkdjflkdjfklj");
+            var key = Encoding.ASCII.GetBytes("MY_BIG_SECRET_KEY_lkdjflkdjfklj¨&@*(@*$()#)()@(#)@(HJB<MBSDKM<BNASD");
 
             services.AddAuthentication(x =>
             {
@@ -41,6 +42,7 @@ namespace IdentityWithJwtBearerToken
                 {
                     x.Events = new JwtBearerEvents
                     {
+
                         OnTokenValidated = context =>
                         {
                             return Task.CompletedTask;
@@ -54,7 +56,10 @@ namespace IdentityWithJwtBearerToken
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(key),
                         ValidateIssuer = false,
-                        ValidateAudience = false
+                        ValidateAudience = false,
+                        //  altera o padrao que é de cinco minutos de expiracao no minimo para zero
+                        ClockSkew = TimeSpan.Zero
+
                     };
                 });
 
