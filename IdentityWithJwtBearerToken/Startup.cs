@@ -1,7 +1,9 @@
+using IdentityWithJwtBearerToken.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,7 +31,11 @@ namespace IdentityWithJwtBearerToken
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            /*
+             * video aula https://www.youtube.com/watch?v=Lh82WlOvyQk&list=LL&index=4&t=858s
+             * 
+             * 
+             * **/
             var key = Encoding.ASCII.GetBytes("MY_BIG_SECRET_KEY_lkdjflkdjfklj¨&@*(@*$()#)()@(#)@(HJB<MBSDKM<BNASD");
 
             services.AddAuthentication(x =>
@@ -45,6 +51,22 @@ namespace IdentityWithJwtBearerToken
 
                         OnTokenValidated = context =>
                         {
+
+                            // 23:50 - IdentityWithJwtBearerTokenUser
+                            //
+                            // deterimna se a pessoa é capaz de acessar os metodos seguros com base no
+                            // token que forneceram
+
+                            var userMachine = context.HttpContext.RequestServices.GetRequiredService<UserManager<IdentityWithJwtBearerTokenUser>>(); // gerenciador de usuario do AspNetCore.Identity
+
+                            //obtem o usuario e as informações de Claims (reinvindicações)
+                            var user = userMachine.GetUserAsync(context.HttpContext.User);
+
+                            // se o usuario do contexto vier nulo, significa Unauthorized
+                            // 26:52 - depois daqui, partimos para configs no ValuesController
+                            if (user == null)
+                                context.Fail("UnAuthorized");
+
                             return Task.CompletedTask;
                         }
                     };
